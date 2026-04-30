@@ -29,14 +29,14 @@ local dungeonData = {
 local headers = {
     "Dungeon",
     "Mob Min",
-    "Boss Level",
-    "Min Tank Level (-3)",
-    "Min DPS Level (-4)",
-    "Min Heals Level (-5)",
-    "Max Level for Exp",
+    "Boss",
+    "Tank",
+    "DPS",
+    "Heals",
+    "Max Exp",
 }
 
-local columnWidths = { 205, 75, 95, 145, 140, 145, 125 }
+local columnWidths = { 190, 58, 52, 52, 52, 58, 62 }
 local rowHeight = 16
 
 local function ToggleMainFrame(frame)
@@ -111,6 +111,13 @@ local function CreateMainWindow()
             colX = colX + columnWidths[col]
         end
     end
+
+
+    local note = content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    note:SetPoint("BOTTOMLEFT", 0, 4)
+    note:SetPoint("BOTTOMRIGHT", 0, 4)
+    note:SetJustifyH("LEFT")
+    note:SetText("Min level notes: Tank = Boss-3, DPS = Boss-4, Heals = Boss-5.\n-3 is a practical tank baseline for threat; DPS can be slightly lower, but groups closer to tank level are safer for final bosses.\nHealers can be lowest due to fewer miss/resist concerns, but undergeared or newer healers should stay closer to tank/DPS levels.")
 
     return frame
 end
