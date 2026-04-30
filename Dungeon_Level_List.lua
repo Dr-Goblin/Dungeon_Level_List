@@ -29,19 +29,27 @@ local dungeonData = {
 local headers = {
     "Dungeon",
     "Mob Min",
-    "Boss",
-    "Tank",
-    "DPS",
-    "Heals",
-    "Max Exp",
+    "Boss Level",
+    "Min Tank Level (-3)",
+    "Min DPS Level (-4)",
+    "Min Heals Level (-5)",
+    "Max Level for Exp",
 }
 
-local columnWidths = { 190, 58, 52, 52, 52, 58, 62 }
+local columnWidths = { 205, 75, 95, 145, 140, 145, 125 }
 local rowHeight = 16
+
+local function ToggleMainFrame(frame)
+    if frame:IsShown() then
+        frame:Hide()
+    else
+        frame:Show()
+    end
+end
 
 local function CreateMainWindow()
     local frame = CreateFrame("Frame", "DungeonLevelListMainFrame", UIParent, "BackdropTemplate")
-    frame:SetSize(620, 450)
+    frame:SetSize(980, 450)
     frame:SetPoint("CENTER")
     frame:SetFrameStrata("DIALOG")
     frame:SetMovable(true)
@@ -50,6 +58,8 @@ local function CreateMainWindow()
     frame:SetScript("OnDragStart", frame.StartMoving)
     frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
     frame:Hide()
+
+    table.insert(UISpecialFrames, frame:GetName())
 
     frame:SetBackdrop({
         bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -105,16 +115,13 @@ local function CreateMainWindow()
     return frame
 end
 
-local function SaveMinimapButtonPosition(button)
-    local angle = math.deg(math.atan2(button:GetCenter() - Minimap:GetCenter()))
-    DungeonLevelListDB.minimapAngle = angle
-end
-
 local function UpdateMinimapButtonPosition(button)
     local angle = math.rad(DungeonLevelListDB.minimapAngle or 225)
     local radius = 80
     local x = math.cos(angle) * radius
     local y = math.sin(angle) * radius
+
+    button:ClearAllPoints()
     button:SetPoint("CENTER", Minimap, "CENTER", x, y)
 end
 
@@ -124,7 +131,6 @@ local function CreateMinimapButton(mainFrame)
     button:SetFrameStrata("MEDIUM")
     button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     button:RegisterForDrag("LeftButton")
-    button:SetMovable(true)
 
     local icon = button:CreateTexture(nil, "BACKGROUND")
     icon:SetSize(20, 20)
@@ -136,46 +142,32 @@ local function CreateMinimapButton(mainFrame)
     border:SetPoint("TOPLEFT")
     border:SetTexture("Interface/Minimap/MiniMap-TrackingBorder")
 
-    button:SetScript("OnClick", function(_, mouseButton)
-        if mouseButton == "RightButton" then
-            if mainFrame:IsShown() then
-                mainFrame:Hide()
-            else
-                mainFrame:Show()
-            end
-            return
-        end
-
-        if mainFrame:IsShown() then
-            mainFrame:Hide()
-        else
-            mainFrame:Show()
-        end
+    button:SetScript("OnClick", function()
+        ToggleMainFrame(mainFrame)
     end)
 
     button:SetScript("OnDragStart", function(self)
-        self:StartMoving()
+        self:SetScript("OnUpdate", function(btn)
+            local mx, my = Minimap:GetCenter()
+            local cx, cy = GetCursorPosition()
+            local scale = UIParent:GetEffectiveScale()
+            cx = cx / scale
+            cy = cy / scale
+
+            local dx, dy = cx - mx, cy - my
+            DungeonLevelListDB.minimapAngle = math.deg(math.atan2(dy, dx))
+            UpdateMinimapButtonPosition(btn)
+        end)
     end)
 
     button:SetScript("OnDragStop", function(self)
-        self:StopMovingOrSizing()
-
-        local mx, my = Minimap:GetCenter()
-        local bx, by = self:GetCenter()
-        if not (mx and my and bx and by) then
-            return
-        end
-
-        local dx, dy = bx - mx, by - my
-        local angle = math.deg(math.atan2(dy, dx))
-        DungeonLevelListDB.minimapAngle = angle
-        UpdateMinimapButtonPosition(self)
+        self:SetScript("OnUpdate", nil)
     end)
 
     button:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_LEFT")
         GameTooltip:SetText("Dungeon Level List", 1, 1, 1)
-        GameTooltip:AddLine("Left Click: Toggle chart", 0.8, 0.8, 0.8)
+        GameTooltip:AddLine("Click: Toggle chart", 0.8, 0.8, 0.8)
         GameTooltip:AddLine("Drag: Move button", 0.8, 0.8, 0.8)
         GameTooltip:Show()
     end)
@@ -195,6 +187,12 @@ DungeonLevelList:SetScript("OnEvent", function(self, event)
 
         self.mainFrame = CreateMainWindow()
         self.minimapButton = CreateMinimapButton(self.mainFrame)
+
+        SLASH_DUNGEONLEVELLIST1 = "/dungeon_level_list"
+        SLASH_DUNGEONLEVELLIST2 = "/Dungeon_level_List"
+        SlashCmdList.DUNGEONLEVELLIST = function()
+            ToggleMainFrame(self.mainFrame)
+        end
 
         self:UnregisterEvent("ADDON_LOADED")
     end
