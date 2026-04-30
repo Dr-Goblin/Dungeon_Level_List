@@ -2,28 +2,31 @@ local addonName = ...
 local DungeonLevelList = CreateFrame("Frame")
 
 local dungeonData = {
-    { "RFC", "13", "16", "13", "12", "11", "18" },
-    { "DMines", "14", "21", "18", "17", "16", "19" },
-    { "WC", "17", "22", "19", "18", "17", "23" },
-    { "SFK", "18", "26", "23", "22", "21", "24" },
-    { "BFD", "22", "28", "25", "24", "23", "28" },
-    { "Stock", "23", "29", "26", "25", "24", "30" },
-    { "RFK", "25", "33", "30", "29", "28", "32" },
-    { "Gnom", "25", "34", "31", "30", "29", "32" },
-    { "SM Gy", "30", "34", "31", "30", "29", "37" },
-    { "SM Lb", "33", "37", "34", "33", "32", "40" },
-    { "SM Arm", "36", "40", "37", "36", "35", "44" },
-    { "RFD", "34", "41", "38", "37", "36", "42" },
-    { "SM Cath", "37", "42", "39", "38", "37", "47" },
-    { "Uld", "39", "47", "44", "43", "42", "49" },
-    { "ZF", "43", "48", "45", "44", "43", "54" },
-    { "Mara", "43", "51", "48", "47", "46", "54" },
-    { "ST", "47", "55", "52", "51", "50", "59" },
-    { "DM:E", "54", "58", "55", "54", "53", "60" },
-    { "BRD", "52", "59", "56", "55", "54", "60" },
-    { "LBRS", "55", "60", "57", "56", "55", "60" },
-    { "DM:W", "56", "61", "58", "57", "56", "60" },
-    { "UBRS, DM:N, Scholo, Strat", "57", "62", "59", "58", "57", "60" },
+    { "Ragefire Chasm", "13", "16", "13", "12", "11", "18" },
+    { "The Deadmines", "14", "21", "18", "17", "16", "19" },
+    { "Wailing Caverns", "17", "22", "19", "18", "17", "23" },
+    { "Shadowfang Keep", "18", "26", "23", "22", "21", "24" },
+    { "Blackfathom Deeps", "22", "28", "25", "24", "23", "28" },
+    { "The Stockade", "23", "29", "26", "25", "24", "30" },
+    { "Razorfen Kraul", "25", "33", "30", "29", "28", "32" },
+    { "Gnomeregan", "25", "34", "31", "30", "29", "32" },
+    { "Scarlet Monastery: Graveyard", "30", "34", "31", "30", "29", "37" },
+    { "Scarlet Monastery: Library", "33", "37", "34", "33", "32", "40" },
+    { "Scarlet Monastery: Armory", "36", "40", "37", "36", "35", "44" },
+    { "Razorfen Downs", "34", "41", "38", "37", "36", "42" },
+    { "Scarlet Monastery: Cathedral", "37", "42", "39", "38", "37", "47" },
+    { "Uldaman", "39", "47", "44", "43", "42", "49" },
+    { "Zul'Farrak", "43", "48", "45", "44", "43", "54" },
+    { "Maraudon", "43", "51", "48", "47", "46", "54" },
+    { "The Temple of Atal'Hakkar", "47", "55", "52", "51", "50", "59" },
+    { "Dire Maul: East", "54", "58", "55", "54", "53", "60" },
+    { "Blackrock Depths", "52", "59", "56", "55", "54", "60" },
+    { "Lower Blackrock Spire", "55", "60", "57", "56", "55", "60" },
+    { "Dire Maul: West", "56", "61", "58", "57", "56", "60" },
+    { "Upper Blackrock Spire", "57", "62", "59", "58", "57", "60" },
+    { "Dire Maul: North", "57", "62", "59", "58", "57", "60" },
+    { "Scholomance", "57", "62", "59", "58", "57", "60" },
+    { "Stratholme", "57", "62", "59", "58", "57", "60" },
 }
 
 local headers = {
@@ -98,21 +101,31 @@ local function CreateMainWindow()
     divider:SetPoint("TOPRIGHT", 0, -18)
     divider:SetHeight(1)
 
+    local totalWidth = 0
+    for _, width in ipairs(columnWidths) do
+        totalWidth = totalWidth + width
+    end
+
     for row, values in ipairs(dungeonData) do
         local y = -22 - ((row - 1) * rowHeight)
-        local colX = 0
+        local rowFrame = CreateFrame("Button", nil, content)
+        rowFrame:SetPoint("TOPLEFT", 0, y)
+        rowFrame:SetSize(totalWidth, rowHeight)
 
         if row % 2 == 0 then
-            local stripe = content:CreateTexture(nil, "BACKGROUND")
+            local stripe = rowFrame:CreateTexture(nil, "BACKGROUND")
+            stripe:SetAllPoints()
             stripe:SetColorTexture(1, 1, 1, 0.06)
-            stripe:SetPoint("TOPLEFT", 0, y + 1)
-            stripe:SetPoint("TOPRIGHT", 0, y + 1)
-            stripe:SetHeight(rowHeight)
         end
 
+        local hover = rowFrame:CreateTexture(nil, "HIGHLIGHT")
+        hover:SetAllPoints()
+        hover:SetColorTexture(1, 0.82, 0, 0.14)
+
+        local colX = 0
         for col = 1, #headers do
-            local text = content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-            text:SetPoint("TOPLEFT", colX, y)
+            local text = rowFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            text:SetPoint("TOPLEFT", colX, 0)
             text:SetWidth(columnWidths[col])
             text:SetJustifyH(col == 1 and "LEFT" or "CENTER")
             text:SetText(values[col])
