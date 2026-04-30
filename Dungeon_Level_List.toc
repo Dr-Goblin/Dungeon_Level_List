@@ -1,0 +1,8 @@
+## Interface: 11508
+## Title: Dungeon Level List
+## Notes: Minimap button that opens a dungeon level chart for Classic Era.
+## Author: Codex
+## Version: 1.0.0
+## SavedVariables: DungeonLevelListDB
+
+Dungeon_Level_List.lua
