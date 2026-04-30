@@ -36,7 +36,7 @@ local headers = {
     "Max Exp",
 }
 
-local columnWidths = { 190, 58, 52, 52, 52, 58, 62 }
+local columnWidths = { 200, 64, 56, 56, 56, 64, 72 }
 local rowHeight = 16
 
 local function ToggleMainFrame(frame)
@@ -49,7 +49,7 @@ end
 
 local function CreateMainWindow()
     local frame = CreateFrame("Frame", "DungeonLevelListMainFrame", UIParent, "BackdropTemplate")
-    frame:SetSize(980, 450)
+    frame:SetSize(640, 500)
     frame:SetPoint("CENTER")
     frame:SetFrameStrata("DIALOG")
     frame:SetMovable(true)
@@ -102,6 +102,14 @@ local function CreateMainWindow()
         local y = -22 - ((row - 1) * rowHeight)
         local colX = 0
 
+        if row % 2 == 0 then
+            local stripe = content:CreateTexture(nil, "BACKGROUND")
+            stripe:SetColorTexture(1, 1, 1, 0.06)
+            stripe:SetPoint("TOPLEFT", 0, y + 1)
+            stripe:SetPoint("TOPRIGHT", 0, y + 1)
+            stripe:SetHeight(rowHeight)
+        end
+
         for col = 1, #headers do
             local text = content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
             text:SetPoint("TOPLEFT", colX, y)
@@ -114,9 +122,10 @@ local function CreateMainWindow()
 
 
     local note = content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    note:SetPoint("BOTTOMLEFT", 0, 4)
-    note:SetPoint("BOTTOMRIGHT", 0, 4)
+    note:SetPoint("TOPLEFT", 0, -390)
+    note:SetWidth(600)
     note:SetJustifyH("LEFT")
+    note:SetJustifyV("TOP")
     note:SetText("Min level notes: Tank = Boss-3, DPS = Boss-4, Heals = Boss-5.\n-3 is a practical tank baseline for threat; DPS can be slightly lower, but groups closer to tank level are safer for final bosses.\nHealers can be lowest due to fewer miss/resist concerns, but undergeared or newer healers should stay closer to tank/DPS levels.")
 
     return frame
