@@ -52,7 +52,7 @@ end
 
 local function CreateMainWindow()
     local frame = CreateFrame("Frame", "DungeonLevelListMainFrame", UIParent, "BackdropTemplate")
-    frame:SetSize(640, 500)
+    frame:SetSize(600, 560)
     frame:SetPoint("CENTER")
     frame:SetFrameStrata("DIALOG")
     frame:SetMovable(true)
@@ -135,8 +135,9 @@ local function CreateMainWindow()
 
 
     local note = content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    note:SetPoint("TOPLEFT", 0, -390)
-    note:SetWidth(600)
+    local noteY = -22 - (#dungeonData * rowHeight) - 10
+    note:SetPoint("TOPLEFT", 0, noteY)
+    note:SetWidth(totalWidth)
     note:SetJustifyH("LEFT")
     note:SetJustifyV("TOP")
     note:SetText("Min level notes: Tank = Boss-3, DPS = Boss-4, Heals = Boss-5.\n-3 is a practical tank baseline for threat; DPS can be slightly lower, but groups closer to tank level are safer for final bosses.\nHealers can be lowest due to fewer miss/resist concerns, but undergeared or newer healers should stay closer to tank/DPS levels.")
